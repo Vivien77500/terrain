@@ -59,8 +59,9 @@
 
         .players {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
+            grid-template-columns: repeat(12, 1fr);
             gap: 10px;
+            justify-content: center;
             width: 100%;
             max-width: 700px;
             padding: 10px;
@@ -95,7 +96,7 @@
             width: 2px;
             background: red;
             transform-origin: top left;
-            z-index: 10;
+            z-index: 20; /* Les flèches restent au premier plan */
         }
 
         .curve-arrow {
@@ -103,7 +104,12 @@
             stroke: red;
             fill: none;
             stroke-width: 2;
-            z-index: 10;
+            z-index: 20; /* Les flèches courbées restent au premier plan */
+        }
+
+        .player-on-field {
+            position: absolute;
+            z-index: 30; /* Les joueurs placés restent au premier plan */
         }
 
         .selected {
@@ -226,7 +232,7 @@
             svg.style.width = "100%";
             svg.style.height = "100%";
             svg.style.overflow = "visible";
-            svg.style.zIndex = "10";
+            svg.style.zIndex = "20";
 
             path.setAttribute("d", `M ${start.x},${start.y} Q ${control.x},${control.y} ${end.x},${end.y}`);
             path.setAttribute("class", "curve-arrow");
@@ -245,11 +251,11 @@
             "Isaac Sogo", "Junayd Bourezgui", "Kayis Amari", "Kiany Babelana Matondo",
             "Kyliane Kibuku", "Loucas Assabbane", "Laiky Lemiere", "Lenny Exumat",
             "Lenyh Delegove-Vally", "Liam Faria", "Manyl Boubrit", "Mathis Sidhoumi",
-            "Mohamed Rakhaoui", "Naïl Mehdi", "Noham Ksia", "Rafael Esteves",
-            "Raphaël You Khou", "Ryad Mayass", "Ryan Badawy", "Ryan Chaabi",
-            "Said Hassan Akbas", "Habishan", "Kishan", "Soulayman Mhamdi",
-            "Thaïs Ntone", "Théo Daigueperce", "Tiago Gendarme", "Tohiniaina Andritsizehena",
-            "Valentin Cherel",             "William Dambrun", "Yacine Touati", "Yani Bouchelkia", "Aylan Bouchelkia", "Yanis Mehdi", "Yassine Moubaraki"
+            "Mohamed Rakhaoui", "Naïl Mehdi", "Noham Ksia", "Rafael Esteves", "Raphaël You Khou", "Ryad Mayass", "Ryan Badawy", "Ryan Chaabi",
+            "Said Hassan Akbas", "Habishan", "Kishan", "Soulayman Mhamdi", "Thaïs Ntone", 
+            "Théo Daigueperce", "Tiago Gendarme", "Tohiniaina Andritsizehena", "Valentin Cherel", 
+            "William Dambrun", "Yacine Touati", "Yani Bouchelkia", "Aylan Bouchelkia", 
+            "Yanis Mehdi", "Yassine Moubaraki"
         ];
 
         // Générer la liste des joueurs sous le terrain
