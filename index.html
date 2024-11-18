@@ -19,18 +19,9 @@
 
         .container {
             display: flex;
-            justify-content: center;
             position: relative;
-            gap: 10px;
-        }
-
-        .field {
-            width: 700px;
-            height: 500px;
-            background: url('terrain.png') no-repeat center center;
-            background-size: contain;
-            position: relative;
-            border: 2px solid #ccc;
+            gap: 20px;
+            align-items: flex-start;
         }
 
         .controls {
@@ -38,9 +29,7 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
-            position: absolute;
-            left: -80px;
-            top: 20px;
+            position: relative;
         }
 
         .arrow-tool {
@@ -59,6 +48,15 @@
             height: 50px;
         }
 
+        .field {
+            width: 700px;
+            height: 500px;
+            background: url('terrain.png') no-repeat center center;
+            background-size: contain;
+            position: relative;
+            border: 2px solid #ccc;
+        }
+
         .players {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
@@ -70,12 +68,34 @@
             border: 1px solid #ccc;
         }
 
+        .player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 5px;
+            background: #fdfdfd;
+        }
+
+        .player img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .player span {
+            margin-top: 5px;
+            font-size: 12px;
+            text-align: center;
+        }
+
         .arrow {
             position: absolute;
             width: 2px;
             background: red;
             transform-origin: top left;
-            z-index: 10; /* Les flèches droites restent au premier plan */
+            z-index: 10;
         }
 
         .curve-arrow {
@@ -83,7 +103,7 @@
             stroke: red;
             fill: none;
             stroke-width: 2;
-            z-index: 10; /* Les flèches courbées restent au premier plan */
+            z-index: 10;
         }
 
         .selected {
@@ -93,6 +113,7 @@
 </head>
 <body>
     <div class="container">
+        <!-- Icônes de flèches -->
         <div class="controls">
             <div class="arrow-tool" id="straight-arrow-tool">
                 <img src="droite.jpg" alt="Flèche droite">
@@ -103,10 +124,14 @@
                 <span>Flèche courbée</span>
             </div>
         </div>
+
+        <!-- Terrain -->
         <div class="field" id="field">
-            <!-- Terrain de foot -->
+            <!-- Flèches et joueurs placés apparaîtront ici -->
         </div>
     </div>
+
+    <!-- Liste des joueurs -->
     <div class="players" id="players">
         <!-- Liste des joueurs générée dynamiquement -->
     </div>
@@ -201,7 +226,7 @@
             svg.style.width = "100%";
             svg.style.height = "100%";
             svg.style.overflow = "visible";
-            svg.style.zIndex = "10"; // Flèche courbée toujours au premier plan
+            svg.style.zIndex = "10";
 
             path.setAttribute("d", `M ${start.x},${start.y} Q ${control.x},${control.y} ${end.x},${end.y}`);
             path.setAttribute("class", "curve-arrow");
@@ -210,15 +235,43 @@
             field.appendChild(svg);
         }
 
-        // Générer une liste de joueurs fictifs (à compléter avec votre liste réelle)
-        const players = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4", "Joueur 5", "Joueur 6", "Joueur 7", "Joueur 8"];
+        // Liste complète des joueurs
+        const players = [
+            "Aaron Esnard le Foll", "Aaron Kae", "Aboubakar Ait Kassou", "Adam Redissi",
+            "Adil Lalaoui", "Amine Benboubker", "Assane Fadika", "Aurélien Achard",
+            "Axel Aggar", "Bradley Woloko Lipeta", "Charle Mendes", "Elijah Banzulu",
+            "Emmanuel Makkaya", "Erwann Pierre", "Ethan Henriet", "Ethan Tomas Espejo",
+            "Farhan Soumanou", "Hosiya", "Ilyes Aissi", "Imed Hassan", "Imran Ben Yahia",
+            "Isaac Sogo", "Junayd Bourezgui", "Kayis Amari", "Kiany Babelana Matondo",
+            "Kyliane Kibuku", "Loucas Assabbane", "Laiky Lemiere", "Lenny Exumat",
+            "Lenyh Delegove-Vally", "Liam Faria", "Manyl Boubrit", "Mathis Sidhoumi",
+            "Mohamed Rakhaoui", "Naïl Mehdi", "Noham Ksia", "Rafael Esteves",
+            "Raphaël You Khou", "Ryad Mayass", "Ryan Badawy", "Ryan Chaabi",
+            "Said Hassan Akbas", "Habishan", "Kishan", "Soulayman Mhamdi",
+            "Thaïs Ntone", "Théo Daigueperce", "Tiago Gendarme", "Tohiniaina Andritsizehena",
+            "Valentin Cherel",             "William Dambrun", "Yacine Touati", "Yani Bouchelkia", "Aylan Bouchelkia", "Yanis Mehdi", "Yassine Moubaraki"
+        ];
 
+        // Générer la liste des joueurs sous le terrain
         players.forEach(player => {
             const playerDiv = document.createElement('div');
             playerDiv.classList.add('player');
-            playerDiv.innerHTML = `<img src="joueur.png" alt="Joueur"><span>${player}</span>`;
+            playerDiv.innerHTML = `
+                <img src="joueur.png" alt="Joueur">
+                <span>${player}</span>
+            `;
             playersContainer.appendChild(playerDiv);
+
+            // Ajouter un événement pour sélectionner un joueur
+            playerDiv.addEventListener('click', () => {
+                const selectedPlayer = document.querySelector('.player.selected');
+                if (selectedPlayer) {
+                    selectedPlayer.classList.remove('selected');
+                }
+                playerDiv.classList.add('selected');
+            });
         });
     </script>
 </body>
 </html>
+
