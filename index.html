@@ -19,9 +19,9 @@
 
         .container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
+            justify-content: center;
+            position: relative;
+            gap: 10px;
         }
 
         .field {
@@ -35,10 +35,12 @@
 
         .controls {
             display: flex;
-            justify-content: space-around;
-            width: 100%;
-            max-width: 700px;
-            margin-top: 10px;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: absolute;
+            left: -80px;
+            top: 20px;
         }
 
         .arrow-tool {
@@ -53,8 +55,19 @@
         }
 
         .arrow-tool img {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
+        }
+
+        .players {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 700px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ccc;
         }
 
         .arrow {
@@ -62,6 +75,7 @@
             width: 2px;
             background: red;
             transform-origin: top left;
+            z-index: 10; /* Les flèches droites restent au premier plan */
         }
 
         .curve-arrow {
@@ -69,6 +83,7 @@
             stroke: red;
             fill: none;
             stroke-width: 2;
+            z-index: 10; /* Les flèches courbées restent au premier plan */
         }
 
         .selected {
@@ -78,25 +93,29 @@
 </head>
 <body>
     <div class="container">
-        <div class="field" id="field">
-            <!-- Le terrain -->
-        </div>
         <div class="controls">
             <div class="arrow-tool" id="straight-arrow-tool">
-                <img src="arrow-straight.png" alt="Flèche droite">
+                <img src="droite.jpg" alt="Flèche droite">
                 <span>Flèche droite</span>
             </div>
             <div class="arrow-tool" id="curve-arrow-tool">
-                <img src="arrow-curve.png" alt="Flèche courbée">
+                <img src="courbe.jpg" alt="Flèche courbée">
                 <span>Flèche courbée</span>
             </div>
         </div>
+        <div class="field" id="field">
+            <!-- Terrain de foot -->
+        </div>
+    </div>
+    <div class="players" id="players">
+        <!-- Liste des joueurs générée dynamiquement -->
     </div>
 
     <script>
         const field = document.getElementById('field');
         const straightArrowTool = document.getElementById('straight-arrow-tool');
         const curveArrowTool = document.getElementById('curve-arrow-tool');
+        const playersContainer = document.getElementById('players');
 
         let isAddingStraightArrow = false;
         let isAddingCurveArrow = false;
@@ -173,12 +192,33 @@
         // Fonction pour dessiner une flèche courbée
         function drawCurveArrow(start, control, end) {
             const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
             const path = document.createElementNS(svgNS, "path");
+
+            svg.style.position = "absolute";
+            svg.style.left = "0";
+            svg.style.top = "0";
+            svg.style.width = "100%";
+            svg.style.height = "100%";
+            svg.style.overflow = "visible";
+            svg.style.zIndex = "10"; // Flèche courbée toujours au premier plan
+
             path.setAttribute("d", `M ${start.x},${start.y} Q ${control.x},${control.y} ${end.x},${end.y}`);
             path.setAttribute("class", "curve-arrow");
 
-            field.appendChild(path);
+            svg.appendChild(path);
+            field.appendChild(svg);
         }
+
+        // Générer une liste de joueurs fictifs (à compléter avec votre liste réelle)
+        const players = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4", "Joueur 5", "Joueur 6", "Joueur 7", "Joueur 8"];
+
+        players.forEach(player => {
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player');
+            playerDiv.innerHTML = `<img src="joueur.png" alt="Joueur"><span>${player}</span>`;
+            playersContainer.appendChild(playerDiv);
+        });
     </script>
 </body>
 </html>
