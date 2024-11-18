@@ -209,9 +209,9 @@
             const playerName = playerDiv.querySelector('span');
             captainCheckbox.addEventListener('change', () => {
                 if (captainCheckbox.checked) {
-                    playerName.innerHTML = `${playerName.textContent} <b>(C)</b>`;
+                    playerName.innerHTML = playerName.textContent.split(" (C)")[0] + " <b>(C)</b>";
                 } else {
-                    playerName.innerHTML = playerName.textContent.replace(" <b>(C)</b>", "");
+                    playerName.innerHTML = playerName.textContent.split(" <b>(C)</b>")[0];
                 }
             });
 
