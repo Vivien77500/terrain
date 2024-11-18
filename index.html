@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terrain de Football avec Flèche Courbée</title>
+    <title>Terrain de Football</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap');
 
@@ -19,33 +19,9 @@
 
         .container {
             display: flex;
-            position: relative;
-            gap: 20px;
-            align-items: flex-start;
-        }
-
-        .controls {
-            display: flex;
             flex-direction: column;
             align-items: center;
             gap: 20px;
-            position: relative;
-        }
-
-        .arrow-tool {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            padding: 10px;
-            background: #fdfdfd;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .arrow-tool img {
-            width: 50px;
-            height: 50px;
         }
 
         .field {
@@ -59,9 +35,8 @@
 
         .players {
             display: grid;
-            grid-template-columns: repeat(12, 1fr);
+            grid-template-columns: repeat(8, 1fr);
             gap: 10px;
-            justify-content: center;
             width: 100%;
             max-width: 700px;
             padding: 10px;
@@ -89,6 +64,45 @@
             margin-top: 5px;
             font-size: 12px;
             text-align: center;
+            font-weight: normal;
+        }
+
+        .player-on-field {
+            position: absolute;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .player-on-field img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .player-on-field span {
+            margin-top: 5px;
+            font-size: 12px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .player-on-field .close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         .curve-arrow {
@@ -106,64 +120,103 @@
 </head>
 <body>
     <div class="container">
-        <!-- Icône de flèche courbée -->
-        <div class="controls">
-            <div class="arrow-tool" id="curve-arrow-tool">
-                <img src="courbe.jpg" alt="Flèche courbée">
-                <span>Flèche courbée</span>
-            </div>
-        </div>
-
         <!-- Terrain -->
         <div class="field" id="field">
-            <!-- Flèches et joueurs placés apparaîtront ici -->
+            <!-- Les joueurs placés et flèches apparaîtront ici -->
         </div>
-    </div>
 
-    <!-- Liste des joueurs -->
-    <div class="players" id="players">
-        <!-- Liste des joueurs générée dynamiquement -->
+        <!-- Liste des joueurs -->
+        <div class="players" id="players">
+            <!-- Joueurs générés dynamiquement -->
+        </div>
     </div>
 
     <script>
-        const field = document.getElementById('field');
-        const curveArrowTool = document.getElementById('curve-arrow-tool');
-        const playersContainer = document.getElementById('players');
+        const players = [
+            "Aaron Esnard le Foll", "Aaron Kae", "Aboubakar Ait Kassou", "Adam Redissi",
+            "Adil Lalaoui", "Amine Benboubker", "Assane Fadika", "Aurélien Achard",
+            "Axel Aggar", "Bradley Woloko Lipeta", "Charle Mendes", "Elijah Banzulu",
+            "Emmanuel Makkaya", "Erwann Pierre", "Ethan Henriet", "Ethan Tomas Espejo",
+            "Farhan Soumanou", "Hosiya", "Ilyes Aissi", "Imed Hassan", "Imran Ben Yahia",
+            "Isaac Sogo", "Junayd Bourezgui", "Kayis Amari", "Kiany Babelana Matondo",
+            "Kyliane Kibuku", "Loucas Assabbane", "Lemiere Laiky", "Lenny Exumat",
+            "Lenyh Delegove-Vally", "Liam Faria", "Manyl Boubrit", "Mathis Sidhoumi",
+            "Mohamed Rakhaoui", "Naïl Mehdi", "Noham Ksia", "Rafael Esteves",
+            "Raphaël You Khou", "Ryad Mayass", "Ryan Badawy", "Ryan Chaabi",
+            "Said Hassan Akbas", "Habishan", "Kishan", "Soulayman Mhamdi",
+            "Thaïs Ntone", "Théo Daigueperce", "Tiago Gendarme", "Tohiniaina Andritsizehena",
+            "Valentin Cherel", "William Dambrun", "Yacine Touati", "Yani Bouchelkia", "Aylan Bouchelkia", "Yanis Mehdi"
+        ];
 
+        const playersContainer = document.getElementById('players');
+        const field = document.getElementById('field');
+        let selectedPlayer = null;
         let isAddingCurveArrow = false;
         let startPoint = null;
         let controlPoint = null;
 
-        // Activer le mode flèche courbée
-        curveArrowTool.addEventListener('click', () => {
-            isAddingCurveArrow = !isAddingCurveArrow;
-            curveArrowTool.classList.toggle('selected', isAddingCurveArrow);
-            startPoint = null;
-            controlPoint = null;
+        // Générer les joueurs
+        players.forEach(player => {
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player');
+            playerDiv.innerHTML = `
+                <img src="joueur.png" alt="Joueur">
+                <span>${player.split(" ")[0]} ${player.split(" ")[1]?.[0] || ''}.</span>
+            `;
+            playersContainer.appendChild(playerDiv);
+
+            // Sélectionner un joueur dans la liste
+            playerDiv.addEventListener('click', () => {
+                if (selectedPlayer) {
+                    selectedPlayer.classList.remove('selected');
+                }
+                selectedPlayer = playerDiv;
+                playerDiv.classList.add('selected');
+            });
         });
 
         // Gérer les clics sur le terrain
         field.addEventListener('click', (e) => {
-            const x = e.offsetX;
-            const y = e.offsetY;
+            if (!selectedPlayer && !isAddingCurveArrow) {
+                alert("Veuillez d'abord sélectionner un joueur ou activer le mode flèche courbée.");
+                return;
+            }
 
             if (isAddingCurveArrow) {
                 if (!startPoint) {
-                    // Définir le point de départ
-                    startPoint = { x, y };
+                    startPoint = { x: e.offsetX, y: e.offsetY };
                 } else if (!controlPoint) {
-                    // Définir le point de contrôle (milieu)
-                    controlPoint = { x, y };
+                    controlPoint = { x: e.offsetX, y: e.offsetY };
                 } else {
-                    // Définir le point de fin et dessiner la flèche courbée
-                    drawCurveArrow(startPoint, controlPoint, { x, y });
+                    drawCurveArrow(startPoint, controlPoint, { x: e.offsetX, y: e.offsetY });
                     startPoint = null;
                     controlPoint = null;
                 }
+                return;
             }
+
+            // Ajouter un joueur
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player-on-field');
+            playerDiv.innerHTML = `
+                ${selectedPlayer.innerHTML}
+                <button class="close-btn">&times;</button>
+            `;
+            playerDiv.style.left = `${e.offsetX}px`;
+            playerDiv.style.top = `${e.offsetY}px`;
+
+            field.appendChild(playerDiv);
+            selectedPlayer.remove();
+            selectedPlayer = null;
+
+            // Ajouter l'événement pour la croix rouge
+            playerDiv.querySelector('.close-btn').addEventListener('click', () => {
+                playersContainer.appendChild(playerDiv);
+                playerDiv.remove();
+            });
         });
 
-        // Fonction pour dessiner une flèche courbée
+        // Dessiner une flèche courbée
         function drawCurveArrow(start, control, end) {
             const svgNS = "http://www.w3.org/2000/svg";
             const svg = document.createElementNS(svgNS, "svg");
@@ -184,42 +237,12 @@
             field.appendChild(svg);
         }
 
-        // Liste complète des joueurs
-        const players = [
-            "Aaron Esnard le Foll", "Aaron Kae", "Aboubakar Ait Kassou", "Adam Redissi",
-            "Adil Lalaoui", "Amine Benboubker", "Assane Fadika", "Aurélien Achard",
-            "Axel Aggar", "Bradley Woloko Lipeta", "Charle Mendes", "Elijah Banzulu",
-            "Emmanuel Makkaya", "Erwann Pierre", "Ethan Henriet", "Ethan Tomas Espejo",
-            "Farhan Soumanou", "Hosiya", "Ilyes Aissi", "Imed Hassan", "Imran Ben Yahia",
-            "Isaac Sogo", "Junayd Bourezgui", "Kayis Amari", "Kiany Babelana Matondo",
-            "Kyliane Kibuku", "Loucas Assabbane", "Laiky Lemiere", "Lenny Exumat",
-            "Lenyh Delegove-Vally", "Liam Faria", "Manyl Boubrit", "Mathis Sidhoumi",
-            "Mohamed Rakhaoui", "Naïl Mehdi", "Noham Ksia", "Rafael Esteves",
-            "Raphaël You Khou", "Ryad Mayass", "Ryan Badawy", "Ryan Chaabi",
-            "Said Hassan Akbas", "Habishan", "Kishan", "Soulayman Mhamdi",
-            "Thaïs Ntone", "Théo Daigueperce", "Tiago Gendarme", "Tohiniaina Andritsizehena",
-            "Valentin Cherel", "William Dambrun", "Yacine Touati", "Yani Bouchelkia", 
-            "Aylan Bouchelkia", "Yanis Mehdi", "Yassine Moubaraki"
-        ];
-
-        // Générer la liste des joueurs sous le terrain
-        players.forEach(player => {
-            const playerDiv = document.createElement('div');
-            playerDiv.classList.add('player');
-            playerDiv.innerHTML = `
-                <img src="joueur.png" alt="Joueur">
-                <span>${player}</span>
-            `;
-            playersContainer.appendChild(playerDiv);
-
-            // Ajouter un événement pour sélectionner un joueur
-            playerDiv.addEventListener('click', () => {
-                const selectedPlayer = document.querySelector('.player.selected');
-                if (selectedPlayer) {
-                    selectedPlayer.classList.remove('selected');
-                }
-                playerDiv.classList.add('selected');
-            });
+        // Activer le mode flèche courbée
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'c') {
+                isAddingCurveArrow = !isAddingCurveArrow;
+                alert(`Mode flèche courbée ${isAddingCurveArrow ? 'activé' : 'désactivé'}.`);
+            }
         });
     </script>
 </body>
