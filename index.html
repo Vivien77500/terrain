@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terrain de Football avec Flèches</title>
+    <title>Terrain de Football avec Flèche Courbée</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap');
 
@@ -91,25 +91,12 @@
             text-align: center;
         }
 
-        .arrow {
-            position: absolute;
-            width: 2px;
-            background: red;
-            transform-origin: top left;
-            z-index: 20; /* Les flèches restent au premier plan */
-        }
-
         .curve-arrow {
             position: absolute;
             stroke: red;
             fill: none;
             stroke-width: 2;
-            z-index: 20; /* Les flèches courbées restent au premier plan */
-        }
-
-        .player-on-field {
-            position: absolute;
-            z-index: 30; /* Les joueurs placés restent au premier plan */
+            z-index: 20; /* Flèches courbées au premier plan */
         }
 
         .selected {
@@ -119,12 +106,8 @@
 </head>
 <body>
     <div class="container">
-        <!-- Icônes de flèches -->
+        <!-- Icône de flèche courbée -->
         <div class="controls">
-            <div class="arrow-tool" id="straight-arrow-tool">
-                <img src="droite.jpg" alt="Flèche droite">
-                <span>Flèche droite</span>
-            </div>
             <div class="arrow-tool" id="curve-arrow-tool">
                 <img src="courbe.jpg" alt="Flèche courbée">
                 <span>Flèche courbée</span>
@@ -144,30 +127,17 @@
 
     <script>
         const field = document.getElementById('field');
-        const straightArrowTool = document.getElementById('straight-arrow-tool');
         const curveArrowTool = document.getElementById('curve-arrow-tool');
         const playersContainer = document.getElementById('players');
 
-        let isAddingStraightArrow = false;
         let isAddingCurveArrow = false;
         let startPoint = null;
         let controlPoint = null;
 
-        // Activer le mode flèche droite
-        straightArrowTool.addEventListener('click', () => {
-            isAddingStraightArrow = !isAddingStraightArrow;
-            isAddingCurveArrow = false;
-            straightArrowTool.classList.toggle('selected', isAddingStraightArrow);
-            curveArrowTool.classList.remove('selected');
-            startPoint = null;
-        });
-
         // Activer le mode flèche courbée
         curveArrowTool.addEventListener('click', () => {
             isAddingCurveArrow = !isAddingCurveArrow;
-            isAddingStraightArrow = false;
             curveArrowTool.classList.toggle('selected', isAddingCurveArrow);
-            straightArrowTool.classList.remove('selected');
             startPoint = null;
             controlPoint = null;
         });
@@ -177,16 +147,7 @@
             const x = e.offsetX;
             const y = e.offsetY;
 
-            if (isAddingStraightArrow) {
-                if (!startPoint) {
-                    // Définir le point de départ
-                    startPoint = { x, y };
-                } else {
-                    // Définir le point d'arrivée et dessiner la flèche
-                    drawStraightArrow(startPoint, { x, y });
-                    startPoint = null;
-                }
-            } else if (isAddingCurveArrow) {
+            if (isAddingCurveArrow) {
                 if (!startPoint) {
                     // Définir le point de départ
                     startPoint = { x, y };
@@ -201,24 +162,6 @@
                 }
             }
         });
-
-        // Fonction pour dessiner une flèche droite
-        function drawStraightArrow(start, end) {
-            const arrow = document.createElement('div');
-            arrow.classList.add('arrow');
-
-            const deltaX = end.x - start.x;
-            const deltaY = end.y - start.y;
-            const length = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-            const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-
-            arrow.style.width = `${length}px`;
-            arrow.style.transform = `rotate(${angle}deg)`;
-            arrow.style.left = `${start.x}px`;
-            arrow.style.top = `${start.y}px`;
-
-            field.appendChild(arrow);
-        }
 
         // Fonction pour dessiner une flèche courbée
         function drawCurveArrow(start, control, end) {
@@ -251,11 +194,12 @@
             "Isaac Sogo", "Junayd Bourezgui", "Kayis Amari", "Kiany Babelana Matondo",
             "Kyliane Kibuku", "Loucas Assabbane", "Laiky Lemiere", "Lenny Exumat",
             "Lenyh Delegove-Vally", "Liam Faria", "Manyl Boubrit", "Mathis Sidhoumi",
-            "Mohamed Rakhaoui", "Naïl Mehdi", "Noham Ksia", "Rafael Esteves", "Raphaël You Khou", "Ryad Mayass", "Ryan Badawy", "Ryan Chaabi",
-            "Said Hassan Akbas", "Habishan", "Kishan", "Soulayman Mhamdi", "Thaïs Ntone", 
-            "Théo Daigueperce", "Tiago Gendarme", "Tohiniaina Andritsizehena", "Valentin Cherel", 
-            "William Dambrun", "Yacine Touati", "Yani Bouchelkia", "Aylan Bouchelkia", 
-            "Yanis Mehdi", "Yassine Moubaraki"
+            "Mohamed Rakhaoui", "Naïl Mehdi", "Noham Ksia", "Rafael Esteves",
+            "Raphaël You Khou", "Ryad Mayass", "Ryan Badawy", "Ryan Chaabi",
+            "Said Hassan Akbas", "Habishan", "Kishan", "Soulayman Mhamdi",
+            "Thaïs Ntone", "Théo Daigueperce", "Tiago Gendarme", "Tohiniaina Andritsizehena",
+            "Valentin Cherel", "William Dambrun", "Yacine Touati", "Yani Bouchelkia", 
+            "Aylan Bouchelkia", "Yanis Mehdi", "Yassine Moubaraki"
         ];
 
         // Générer la liste des joueurs sous le terrain
@@ -280,4 +224,3 @@
     </script>
 </body>
 </html>
-
