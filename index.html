@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terrain de Football Responsive</title>
+    <title>Terrain de Football</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap');
 
-        /* Global */
         body {
             font-family: 'Assistant', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-direction: row;
+            justify-content: center;
             background-color: #f5f5f5;
         }
 
@@ -23,11 +22,8 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
-            width: 100%;
-            max-width: 1200px;
         }
 
-        /* Terrain */
         .field {
             width: 700px;
             height: 500px;
@@ -37,20 +33,6 @@
             border: 2px solid #ccc;
         }
 
-        .player-on-field {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .player-on-field img {
-            width: 50px;
-            height: 50px;
-        }
-
-        /* Liste des joueurs */
         .players {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
@@ -78,10 +60,54 @@
             height: 50px;
         }
 
+        .player span {
+            margin-top: 5px;
+            font-size: 12px;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        .player-on-field {
+            position: absolute;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .player-on-field img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .player-on-field span {
+            margin-top: 5px;
+            font-size: 12px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .player-on-field .close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         .composition {
-            margin-top: 20px;
-            width: 100%;
-            max-width: 400px;
+            margin-left: 20px;
+            width: 200px;
             padding: 10px;
             background: #fff;
             border: 1px solid #ccc;
@@ -90,22 +116,30 @@
 
         .composition h3 {
             text-align: center;
+            margin-bottom: 10px;
             font-size: 18px;
             font-weight: bold;
         }
 
-        .composition ul {
+        .composition-list {
             list-style: none;
             padding: 0;
-            margin: 0;
+            font-weight: bold;
         }
 
-        .composition ul li {
+        .composition-list li {
             margin-bottom: 5px;
             font-size: 14px;
         }
 
+        .composition-list .subsection {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
         .composition button {
+            margin-top: 20px;
             width: 100%;
             padding: 10px;
             background: #6fb98f;
@@ -121,48 +155,8 @@
             background: #5aa67b;
         }
 
-        /* Responsive Design */
-        @media screen and (max-width: 768px) {
-            .field {
-                width: 90%;
-                height: auto;
-            }
-
-            .players {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
-            .player img {
-                width: 40px;
-                height: 40px;
-            }
-
-            .composition {
-                max-width: 100%;
-            }
-
-            .composition button {
-                font-size: 12px;
-            }
-        }
-
-        @media screen and (max-width: 480px) {
-            .players {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .field {
-                height: 300px;
-            }
-
-            .player img {
-                width: 30px;
-                height: 30px;
-            }
-
-            .composition button {
-                font-size: 10px;
-            }
+        .selected {
+            border: 2px solid #6fb98f;
         }
     </style>
 </head>
@@ -175,17 +169,17 @@
 
         <!-- Liste des joueurs -->
         <div class="players" id="players">
-            <!-- Les joueurs générés dynamiquement -->
+            <!-- Joueurs générés dynamiquement -->
         </div>
+    </div>
 
-        <!-- Liste de composition -->
-        <div class="composition">
-            <h3>Composition</h3>
-            <ul id="composition-list">
-                <!-- Les joueurs placés sur le terrain -->
-            </ul>
-            <button id="validate">Valider</button>
-        </div>
+    <!-- Liste de composition -->
+    <div class="composition">
+        <h3>Composition</h3>
+        <ul id="composition-list" class="composition-list">
+            <!-- Joueurs placés sur le terrain -->
+        </ul>
+        <button id="validate">Valider</button>
     </div>
 
     <script>
@@ -206,27 +200,232 @@
             "Aylan Bouchelkia", "Yanis Mehdi", "Yassine Moubaraki"
         ];
 
+        const playersContainer = document.getElementById('players');
+        const field = document.getElementById('field');
+        const compositionList = document.getElementById('composition-list');
+        const validateButton = document.getElementById('validate');
+        let selectedPlayer = null;
+        let playerCount = 0;
+
         const zones = [
-    { name: "DG", x1: 0, y1: 0, x2: 120, y2: 150 }, // DG avance en grappillant sur MG
-    { name: "MG", x1: 120, y1: 0, x2: 280, y2: 150 }, // MG réduit pour DG
-    { name: "AG", x1: 280, y1: 0, x2: 400, y2: 150 }, // AG reste inchangé
-    { name: "GB", x1: 0, y1: 150, x2: 48, y2: 300 }, // GB1 avance en grappillant sur GB2
-    { name: "DC", x1: 48, y1: 150, x2: 120, y2: 300 }, // GB2 réduit pour GB1
-    { name: "MC", x1: 120, y1: 150, x2: 280, y2: 300 }, // MC reste inchangé
-    { name: "ATT", x1: 280, y1: 150, x2: 400, y2: 300 }, // ATT reste inchangé
-    { name: "DD", x1: 0, y1: 300, x2: 120, y2: 450 }, // DD avance en grappillant sur MD
-    { name: "MD", x1: 120, y1: 300, x2: 280, y2: 450 }, // MD réduit pour DD
-    { name: "AD", x1: 280, y1: 300, x2: 400, y2: 450 } // AD reste inchangé
-];
+            { name: "DG", x1: 0, y1: 0, x2: 120, y2: 150 },
+            { name: "MG", x1: 120, y1: 0, x2: 280, y2: 150 },
+            { name: "AG", x1: 280, y1: 0, x2: 400, y2: 150 },
+            { name: "GB", x1: 0, y1: 150, x2: 48, y2: 300 },
+            { name: "DC", x1: 48, y1: 150, x2: 120, y2: 300 },
+            { name: "MC", x1: 120, y1: 150, x2: 280, y2: 300 },
+            { name: "ATT", x1: 280, y1: 150, x2: 400, y2: 300 },
+            { name: "DD", x1: 0, y1: 300, x2: 120, y2: 450 },
+            { name: "MD", x1: 120, y1: 300, x2: 280, y2: 450 },
+            { name: "AD", x1: 280, y1: 300, x2: 400, y2: 450 }
+        ];
+
+        function getPositionRole(x, y) {
+            for (const zone of zones) {
+                if (x >= zone.x1 && x < zone.x2 && y >= zone.y1 && y < zone.y2) {
+                    return zone.name;
+                }
+            }
+            return "N/A";
+        }
 
         players.forEach(player => {
             const playerDiv = document.createElement('div');
             playerDiv.classList.add('player');
             playerDiv.innerHTML = `
                 <img src="joueur.png" alt="Joueur">
-                <span>${player}</span>
+                <span>${player.split(' ')[0]} ${player.split(' ')[1]?.[0] || ''}.</span>
             `;
-            document.getElementById('players').appendChild(playerDiv);
+            playersContainer.appendChild(playerDiv);
+
+            playerDiv.addEventListener('click', () => {
+                if (selectedPlayer) {
+                    selectedPlayer.classList.remove('selected');
+                }
+                selectedPlayer = playerDiv;
+                playerDiv.classList.add('selected');
+            });
+        });
+
+        field.addEventListener('click', (e) => {
+            if (!selectedPlayer) {
+                alert("Veuillez d'abord sélectionner un joueur.");
+                return;
+            }
+
+            const playerName = selectedPlayer.textContent.trim();
+            const x = e.offsetX;
+            const y = e.offsetY;
+
+            const positionRole = getPositionRole(x, y);
+
+            // Ajouter un nouveau joueur au terrain
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player-on-field');
+            const isGoalkeeper = positionRole === "GB";
+            const imgSrc = isGoalkeeper ? "joueurGB.png" : "joueur.png";
+            playerDiv.innerHTML = `
+                <img src="${imgSrc}" alt="Joueur">
+                <span>${playerName} (${positionRole})</span>
+                <button class="close-btn">&times;</button>
+            `;
+            playerDiv.style.left = `${x}px`;
+            playerDiv.style.top = `${y}px`;
+
+            field.appendChild(playerDiv);
+
+            if (!document.querySelector(`li[data-player="${playerName}"]`)) {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${playerName} (${positionRole})`;
+                listItem.setAttribute('data-player', playerName);
+                compositionList.appendChild(listItem);
+
+                playerCount++;
+                if (playerCount === 8) {
+                    const separator = document.createElement('li');
+                    separator.classList.add('subsection');
+                    separator.textContent = 'Remplaçants';
+                    compositionList.appendChild(separator);
+                }
+            }
+
+            selectedPlayer.remove();
+            selectedPlayer = null;
+
+            const closeBtn = playerDiv.querySelector('.close-btn');
+            closeBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+
+                const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
+                if (itemToRemove) {
+                    itemToRemove.remove();
+                }
+
+                playerCount--;
+                if (playerCount === 7) {
+                    const separator = document.querySelector('.composition-list .subsection');
+                    if (separator) separator.remove();
+                }
+
+                const newPlayerDiv = document.createElement('div');
+                newPlayerDiv.classList.add('player');
+                newPlayerDiv.innerHTML = `
+                    <img src="joueur.png" alt="Joueur">
+                    <span>${playerName}</span>
+                `;
+                playersContainer.appendChild(newPlayerDiv);
+
+                newPlayerDiv.addEventListener('click', () => {
+                    if (selectedPlayer) {
+                        selectedPlayer.classList.remove('selected');
+                    }
+                    selectedPlayer = newPlayerDiv;
+                    newPlayerDiv.classList.add('selected');
+                });
+
+                playerDiv.remove();
+            });
+        });
+
+        // Validation et impression
+        validateButton.addEventListener('click', () => {
+            const printWindow = window.open('', '_blank');
+            const printContent = `
+                <!DOCTYPE html>
+                <html lang="fr">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Impression Composition</title>
+                    <style>
+                        body {
+                            font-family: 'Assistant', sans-serif;
+                            margin: 0;
+                            padding: 20px;
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                        }
+                        .field {
+                            width: 60%;
+                            position: relative;
+                        }
+                        .field img {
+                            width: 100%;
+                            height: auto;
+                        }
+                        .player-on-field {
+                            position: absolute;
+                            transform: translate(-50%, -50%);
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                        .player-on-field img {
+                            width: 8%;
+                            height: auto;
+                        }
+                        .player-on-field span {
+                            margin-top: 5px;
+                            font-size: 1vw;
+                            color: white;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                        .composition {
+                            width: 35%;
+                            padding: 10px;
+                            background: #fff;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                        }
+                        .composition h3 {
+                            text-align: center;
+                            margin-bottom: 10px;
+                            font-size: 18px;
+                            font-weight: bold;
+                        }
+                        .composition-list {
+                            list-style: none;
+                            padding: 0;
+                            font-weight: bold;
+                        }
+                        .composition-list li {
+                            margin-bottom: 5px;
+                            font-size: 14px;
+                        }
+                        .composition-list .subsection {
+                            margin-top: 10px;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="field">
+                        <img src="terrain.png" alt="Terrain">
+                        ${Array.from(field.querySelectorAll('.player-on-field'))
+                            .map(player => {
+                                const playerCopy = player.cloneNode(true);
+                                const closeBtn = playerCopy.querySelector('.close-btn');
+                                if (closeBtn) closeBtn.remove();
+                                return playerCopy.outerHTML;
+                            })
+                            .join('')}
+                    </div>
+                    <div class="composition">
+                        <h3>Composition</h3>
+                        <ul>
+                            ${compositionList.innerHTML}
+                        </ul>
+                    </div>
+                </body>
+                </html>
+            `;
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
         });
     </script>
 </body>
