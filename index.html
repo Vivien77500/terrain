@@ -12,8 +12,8 @@
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-direction: row;
+            justify-content: center;
             background-color: #f5f5f5;
         }
 
@@ -105,6 +105,32 @@
             cursor: pointer;
         }
 
+        .composition {
+            margin-left: 20px;
+            width: 200px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .composition h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .composition-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .composition-list li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
         .selected {
             border: 2px solid #6fb98f;
         }
@@ -121,6 +147,14 @@
         <div class="players" id="players">
             <!-- Joueurs générés dynamiquement -->
         </div>
+    </div>
+
+    <!-- Liste de composition -->
+    <div class="composition">
+        <h3>Composition</h3>
+        <ul id="composition-list" class="composition-list">
+            <!-- Joueurs placés sur le terrain -->
+        </ul>
     </div>
 
     <script>
@@ -142,6 +176,7 @@
 
         const playersContainer = document.getElementById('players');
         const field = document.getElementById('field');
+        const compositionList = document.getElementById('composition-list');
         let selectedPlayer = null;
 
         // Générer les joueurs
@@ -178,15 +213,6 @@
                 return;
             }
 
-            // Si le joueur sélectionné est déjà sur le terrain, simplement le repositionner
-            if (selectedPlayer.classList.contains('player-on-field')) {
-                selectedPlayer.style.left = `${e.offsetX}px`;
-                selectedPlayer.style.top = `${e.offsetY}px`;
-                selectedPlayer.classList.remove('selected');
-                selectedPlayer = null;
-                return;
-            }
-
             // Ajouter un nouveau joueur au terrain
             const playerDiv = document.createElement('div');
             playerDiv.classList.add('player-on-field');
@@ -199,6 +225,12 @@
             playerDiv.style.top = `${e.offsetY}px`;
 
             field.appendChild(playerDiv);
+
+            // Ajouter le joueur à la composition
+            const listItem = document.createElement('li');
+            listItem.textContent = selectedPlayer.textContent.trim();
+            listItem.setAttribute('data-player', selectedPlayer.textContent.trim());
+            compositionList.appendChild(listItem);
 
             // Supprimer le joueur de la liste
             selectedPlayer.remove();
@@ -218,13 +250,22 @@
             const closeBtn = playerDiv.querySelector('.close-btn');
             closeBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
+
+                // Supprimer le joueur de la composition
+                const playerName = playerDiv.textContent.trim();
+                const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
+                if (itemToRemove) {
+                    itemToRemove.remove();
+                }
+
+                // Retourner le joueur à la liste
                 const newPlayerDiv = document.createElement('div');
                 newPlayerDiv.classList.add('player');
                 newPlayerDiv.innerHTML = playerDiv.innerHTML.split('<button')[0]; // Supprime la croix rouge
                 playersContainer.appendChild(newPlayerDiv);
 
-                // Gérer la sélection à nouveau
-                newPlayerDiv.addEventListener('click', () => {
+                                // Gérer la sélection à nouveau
+                                newPlayerDiv.addEventListener('click', () => {
                     if (selectedPlayer) {
                         selectedPlayer.classList.remove('selected');
                     }
@@ -238,3 +279,4 @@
     </script>
 </body>
 </html>
+
