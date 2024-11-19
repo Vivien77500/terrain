@@ -71,6 +71,11 @@
             background: #fdfdfd;
         }
 
+        .player:hover,
+        .selected {
+            border: 2px solid #6fb98f;
+        }
+
         .player img {
             width: 40px;
             height: 40px;
@@ -101,7 +106,7 @@
 
         .player-on-field span {
             margin-top: 5px;
-            font-size: 6px;
+            font-size: 6px; /* Ajustement conservé */
             color: white;
             font-weight: bold;
             text-align: center;
@@ -199,7 +204,7 @@
             }
 
             .player-on-field span {
-                font-size: 5px;
+                font-size: 5px; /* Plus petite taille sur mobile */
                 line-height: 1.1;
             }
 
