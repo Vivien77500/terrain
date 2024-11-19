@@ -124,6 +124,7 @@
         .composition-list {
             list-style: none;
             padding: 0;
+            font-weight: bold;
         }
 
         .composition-list li {
@@ -267,13 +268,13 @@
             selectedPlayer.remove();
             selectedPlayer = null;
 
-            // Gérer le retour dans la liste avec la croix rouge
-            const closeBtn = playerDiv.querySelector('.close-btn');
+                        // Gérer le retour dans la liste avec la croix rouge
+                        const closeBtn = playerDiv.querySelector('.close-btn');
             closeBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
 
-                                // Supprimer le joueur de la composition
-                                const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
+                // Supprimer le joueur de la composition
+                const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
                 if (itemToRemove) {
                     itemToRemove.remove();
                 }
@@ -333,6 +334,22 @@
                         .field img {
                             width: 100%;
                         }
+                        .player-on-field {
+                            position: absolute;
+                            transform: translate(-50%, -50%);
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                        .player-on-field img {
+                            width: 50px;
+                            height: 50px;
+                        }
+                        .player-on-field span {
+                            margin-top: 5px;
+                            font-size: 12px;
+                            color: white;
+                            font-weight: bold;
+                        }
                         .composition {
                             width: 35%;
                             padding: 10px;
@@ -349,6 +366,7 @@
                         .composition-list {
                             list-style: none;
                             padding: 0;
+                            font-weight: bold;
                         }
                         .composition-list li {
                             margin-bottom: 5px;
@@ -363,7 +381,10 @@
                 </head>
                 <body>
                     <div class="field">
-                        ${field.innerHTML}
+                        <img src="terrain.png" alt="Terrain">
+                        ${Array.from(field.querySelectorAll('.player-on-field'))
+                            .map(player => player.outerHTML)
+                            .join('')}
                     </div>
                     <div class="composition">
                         <h3>Composition</h3>
