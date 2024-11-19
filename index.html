@@ -207,6 +207,137 @@
         let selectedPlayer = null;
         let playerCount = 0;
 
+        // Définir les zones du terrain et leurs postes associés
+        const zones = [
+            { name: "GB", x1: 0, y1: 0, x2: 100, y2: 150 },
+            { name: "DC", x1: 100, y1: 0, x2: 300, y2: 150 },
+            { name: "DD", x1: 300, y1: 0, x2: 400, y2: 150 },
+            { name: "DG", x1: 0, y1: 150, x2: 100, y2: 300 },
+            { name: "MC", x1: 100, y1: 150, x2: 300, y2: 300 },
+            { name: "MD", x1: 300, y1: 150, x2: 400, y2: 300 },
+            { name: "MG", x1: 0, y1: 300, x2: 100, y2: 450 },
+            { name: "ATT", x1: 100, y1: 300, x2: 300, y2: 450 },
+            { name: "REMP", x1: 300, y1: 300, x2: 400, y2: 450 }
+        ];
+
+        // Trouver le poste correspondant à une position (x, y)
+        function getPositionRole(x, y) {
+            for (const zone of zones) {
+                if (x >= zone.x1 && x < zone.x2 && y >= zone.y1 && y < zone.y2) {
+                    return zone.name;
+                }
+            }
+            return "N/A"; // Poste non défini
+        }
+
+        // Gestion du bouton Valider avec postes inclus dans l'impression
+        validateButton.addEventListener('click', () => {
+            const printWindow = window.open('', '_blank');
+            const printContent = `
+                <!DOCTYPE html>
+                <html lang="fr">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Impression Composition</title>
+                    <style>
+                        body {
+                            font-family: 'Assistant', sans-serif;
+                            margin: 0;
+                            padding: 20px;
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                        }
+                        .field {
+                            width: 60%;
+                            position: relative;
+                        }
+                        .field img {
+                            width: 100%;
+                            height: auto;
+                        }
+                        .player-on-field {
+                            position: absolute;
+                            transform: translate(-50%, -50%);
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                        .player-on-field img {
+                            width: 8%;
+                            height: auto;
+                        }
+                        .player-on-field span {
+                            margin-top: 5px;
+                            font-size: 1vw;
+                            color: white;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                        .composition {
+                            width: 35%;
+                            padding: 10px;
+                            background: #fff;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                        }
+                        .composition h3 {
+                            text-align: center;
+                            margin-bottom: 10px;
+                            font-size: 18px;
+                            font-weight: bold;
+                        }
+                        .composition-list {
+                            list-style: none;
+                            padding: 0;
+                            font-weight: bold;
+                        }
+                        .composition-list li {
+                            margin-bottom: 5px;
+                            font-size: 14px;
+                        }
+                        .composition-list .subsection {
+                            margin-top: 10px;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="field">
+                        <img src="terrain.png" alt="Terrain">
+                        ${Array.from(field.querySelectorAll('.player-on-field'))
+                            .map(player => {
+                                const playerCopy = player.cloneNode(true);
+                                const closeBtn = playerCopy.querySelector('.close-btn');
+                                if (closeBtn) closeBtn.remove();
+                                return playerCopy.outerHTML;
+                            })
+                            .join('')}
+                    </div>
+                    <div class="composition">
+                        <h3>Composition</h3>
+                        <ul>
+                            ${Array.from(compositionList.children)
+                                .map(child => {
+                                    if (child.classList.contains('subsection')) {
+                                        return `<li class="subsection">${child.textContent}</li>`;
+                                    }
+                                    return `<li>${child.textContent}</li>`;
+                                })
+                                .join('')}
+                        </ul>
+                    </div>
+                </body>
+                </html>
+            `;
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+        });
+
         // Générer les joueurs
         players.forEach(player => {
             const playerDiv = document.createElement('div');
@@ -235,23 +366,25 @@
             }
 
             const playerName = selectedPlayer.textContent.trim();
+            const x = e.offsetX;
+            const y = e.offsetY;
 
-            // Ajouter un nouveau joueur au terrain
+            const positionRole = getPositionRole(x, y);
+
             const playerDiv = document.createElement('div');
             playerDiv.classList.add('player-on-field');
             playerDiv.innerHTML = `
                 ${selectedPlayer.innerHTML}
                 <button class="close-btn">&times;</button>
             `;
-            playerDiv.style.left = `${e.offsetX}px`;
-            playerDiv.style.top = `${e.offsetY}px`;
+            playerDiv.style.left = `${x}px`;
+            playerDiv.style.top = `${y}px`;
 
             field.appendChild(playerDiv);
 
-            // Ajouter le joueur à la composition
             if (!document.querySelector(`li[data-player="${playerName}"]`)) {
                 const listItem = document.createElement('li');
-                listItem.textContent = playerName;
+                listItem.textContent = `${playerName} (${positionRole})`;
                 listItem.setAttribute('data-player', playerName);
                 compositionList.appendChild(listItem);
 
@@ -264,35 +397,29 @@
                 }
             }
 
-            // Supprimer le joueur de la liste
             selectedPlayer.remove();
             selectedPlayer = null;
 
-            // Gérer le retour dans la liste avec la croix rouge
             const closeBtn = playerDiv.querySelector('.close-btn');
             closeBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
 
-                // Supprimer le joueur de la composition
                 const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
                 if (itemToRemove) {
                     itemToRemove.remove();
                 }
 
-                // Réduire le compteur de joueurs et supprimer le séparateur si nécessaire
                 playerCount--;
-                if (playerCount === 7) { // Revenir à 7 joueurs pour supprimer le séparateur
+                if (playerCount === 7) {
                     const separator = document.querySelector('.composition-list .subsection');
                     if (separator) separator.remove();
                 }
 
-                // Retourner le joueur à la liste des joueurs
                 const newPlayerDiv = document.createElement('div');
                 newPlayerDiv.classList.add('player');
-                newPlayerDiv.innerHTML = playerDiv.innerHTML.split('<button')[0]; // Supprime la croix rouge
+                newPlayerDiv.innerHTML = playerDiv.innerHTML.split('<button')[0];
                 playersContainer.appendChild(newPlayerDiv);
 
-                // Gérer la sélection à nouveau
                 newPlayerDiv.addEventListener('click', () => {
                     if (selectedPlayer) {
                         selectedPlayer.classList.remove('selected');
@@ -301,114 +428,9 @@
                     newPlayerDiv.classList.add('selected');
                 });
 
-                // Supprimer le joueur du terrain
                 playerDiv.remove();
             });
         });
-
-        // Gestion du bouton Valider
-        validateButton.addEventListener('click', () => {
-    // Créer une fenêtre d'impression
-    const printWindow = window.open('', '_blank');
-    const printContent = `
-        <!DOCTYPE html>
-        <html lang="fr">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Impression Composition</title>
-            <style>
-                body {
-                    font-family: 'Assistant', sans-serif;
-                    margin: 0;
-                    padding: 20px;
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                    align-items: flex-start;
-                }
-                .field {
-                    width: 60%;
-                    position: relative;
-                }
-                .field img {
-                    width: 100%;
-                    height: auto;
-                }
-                .player-on-field {
-                    position: absolute;
-                    transform: translate(-50%, -50%);
-                    font-weight: bold;
-                    text-align: center;
-                }
-                .player-on-field img {
-                    width: 8%; /* Taille dynamique basée sur la largeur du terrain */
-                    height: auto;
-                }
-                .player-on-field span {
-                    margin-top: 5px;
-                    font-size: 1vw; /* Taille dynamique basée sur la fenêtre */
-                    color: white;
-                    font-weight: bold;
-                    text-align: center;
-                }
-                .composition {
-                    width: 35%;
-                    padding: 10px;
-                    background: #fff;
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                }
-                .composition h3 {
-                    text-align: center;
-                    margin-bottom: 10px;
-                    font-size: 18px;
-                    font-weight: bold;
-                }
-                .composition-list {
-                    list-style: none;
-                    padding: 0;
-                    font-weight: bold;
-                }
-                .composition-list li {
-                    margin-bottom: 5px;
-                    font-size: 14px;
-                }
-                .composition-list .subsection {
-                    margin-top: 10px;
-                    font-weight: bold;
-                    text-align: center;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="field">
-                <img src="terrain.png" alt="Terrain">
-                ${Array.from(field.querySelectorAll('.player-on-field'))
-                    .map(player => {
-                        // Supprimer la croix rouge pour chaque joueur
-                        const playerCopy = player.cloneNode(true);
-                        const closeBtn = playerCopy.querySelector('.close-btn');
-                        if (closeBtn) closeBtn.remove();
-                        return playerCopy.outerHTML;
-                    })
-                    .join('')}
-            </div>
-            <div class="composition">
-                <h3>Composition</h3>
-                <ul>
-                    ${compositionList.innerHTML}
-                </ul>
-            </div>
-        </body>
-        </html>
-    `;
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-});
     </script>
 </body>
 </html>
-
