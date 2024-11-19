@@ -131,6 +131,12 @@
             font-size: 14px;
         }
 
+        .composition-list .subsection {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
         .selected {
             border: 2px solid #6fb98f;
         }
@@ -165,34 +171,29 @@
             "Emmanuel Makkaya", "Erwann Pierre", "Ethan Henriet", "Ethan Tomas Espejo",
             "Farhan Soumanou", "Hosiya", "Ilyes Aissi", "Imed Hassan", "Imran Ben Yahia",
             "Isaac Sogo", "Junayd Bourezgui", "Kayis Amari", "Kiany Babelana Matondo",
-            "Kyliane Kibuku", "Loucas Assabbane", "Lemiere Laiky", "Lenny Exumat",
+            "Kyliane Kibuku", "Loucas Assabbane", "Laiky Lemiere", "Lenny Exumat",
             "Lenyh Delegove-Vally", "Liam Faria", "Manyl Boubrit", "Mathis Sidhoumi",
             "Mohamed Rakhaoui", "Naïl Mehdi", "Noham Ksia", "Rafael Esteves",
             "Raphaël You Khou", "Ryad Mayass", "Ryan Badawy", "Ryan Chaabi",
             "Said Hassan Akbas", "Habishan", "Kishan", "Soulayman Mhamdi",
             "Thaïs Ntone", "Théo Daigueperce", "Tiago Gendarme", "Tohiniaina Andritsizehena",
-            "Valentin Cherel", "William Dambrun", "Yacine Touati", "Yani Bouchelkia", "Aylan Bouchelkia", "Yanis Mehdi"
+            "Valentin Cherel", "William Dambrun", "Yacine Touati", "Yani Bouchelkia", 
+            "Aylan Bouchelkia", "Yanis Mehdi", "Yassine Moubaraki"
         ];
 
         const playersContainer = document.getElementById('players');
         const field = document.getElementById('field');
         const compositionList = document.getElementById('composition-list');
         let selectedPlayer = null;
+        let playerCount = 0;
 
         // Générer les joueurs
         players.forEach(player => {
             const playerDiv = document.createElement('div');
             playerDiv.classList.add('player');
-            
-            const playerParts = player.split(' ');
-            let displayName = playerParts[0];
-            if (playerParts.length === 2) {
-                displayName = `${playerParts[0]} ${playerParts[1][0]}.`;
-            }
-
             playerDiv.innerHTML = `
                 <img src="joueur.png" alt="Joueur">
-                <span>${displayName}</span>
+                <span>${player.split(' ')[0]} ${player.split(' ')[1]?.[0] || ''}.</span>
             `;
             playersContainer.appendChild(playerDiv);
 
@@ -213,6 +214,8 @@
                 return;
             }
 
+            const playerName = selectedPlayer.textContent.trim();
+
             // Ajouter un nouveau joueur au terrain
             const playerDiv = document.createElement('div');
             playerDiv.classList.add('player-on-field');
@@ -220,31 +223,30 @@
                 ${selectedPlayer.innerHTML}
                 <button class="close-btn">&times;</button>
             `;
-
             playerDiv.style.left = `${e.offsetX}px`;
             playerDiv.style.top = `${e.offsetY}px`;
 
             field.appendChild(playerDiv);
 
             // Ajouter le joueur à la composition
-            const listItem = document.createElement('li');
-            listItem.textContent = selectedPlayer.textContent.trim();
-            listItem.setAttribute('data-player', selectedPlayer.textContent.trim());
-            compositionList.appendChild(listItem);
+            if (!document.querySelector(`li[data-player="${playerName}"]`)) {
+                const listItem = document.createElement('li');
+                listItem.textContent = playerName;
+                listItem.setAttribute('data-player', playerName);
+                compositionList.appendChild(listItem);
+
+                playerCount++;
+                if (playerCount === 9) {
+                    const separator = document.createElement('li');
+                    separator.classList.add('subsection');
+                    separator.textContent = 'Remplaçants';
+                    compositionList.appendChild(separator);
+                }
+            }
 
             // Supprimer le joueur de la liste
             selectedPlayer.remove();
             selectedPlayer = null;
-
-            // Gérer la sélection et le repositionnement des joueurs sur le terrain
-            playerDiv.addEventListener('click', (event) => {
-                event.stopPropagation(); // Empêche le clic sur le terrain
-                if (selectedPlayer) {
-                    selectedPlayer.classList.remove('selected');
-                }
-                selectedPlayer = playerDiv;
-                playerDiv.classList.add('selected');
-            });
 
             // Gérer le retour dans la liste avec la croix rouge
             const closeBtn = playerDiv.querySelector('.close-btn');
@@ -252,20 +254,26 @@
                 event.stopPropagation();
 
                 // Supprimer le joueur de la composition
-                const playerName = playerDiv.textContent.trim();
                 const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
                 if (itemToRemove) {
                     itemToRemove.remove();
                 }
 
-                // Retourner le joueur à la liste
+                // Réduire le compteur de joueurs et supprimer le séparateur si nécessaire
+                playerCount--;
+                if (playerCount === 8) {
+                    const separator = document.querySelector('.composition-list .subsection');
+                    if (separator) separator.remove();
+                }
+
+                // Retourner le joueur à la liste des joueurs
                 const newPlayerDiv = document.createElement('div');
                 newPlayerDiv.classList.add('player');
                 newPlayerDiv.innerHTML = playerDiv.innerHTML.split('<button')[0]; // Supprime la croix rouge
                 playersContainer.appendChild(newPlayerDiv);
 
-                                // Gérer la sélection à nouveau
-                                newPlayerDiv.addEventListener('click', () => {
+                // Gérer la sélection à nouveau
+                newPlayerDiv.addEventListener('click', () => {
                     if (selectedPlayer) {
                         selectedPlayer.classList.remove('selected');
                     }
@@ -273,7 +281,8 @@
                     newPlayerDiv.classList.add('selected');
                 });
 
-                playerDiv.remove(); // Supprime le joueur du terrain
+                // Supprimer le joueur du terrain
+                playerDiv.remove();
             });
         });
     </script>
