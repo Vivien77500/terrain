@@ -212,14 +212,16 @@
     { name: "DG", x1: 0, y1: 0, x2: 100, y2: 150 },
     { name: "MG", x1: 100, y1: 0, x2: 300, y2: 150 },
     { name: "AG", x1: 300, y1: 0, x2: 400, y2: 150 },
-    { name: "GB", x1: 0, y1: 150, x2: 50, y2: 300 }, // Moitié gauche pour GB
-    { name: "DC", x1: 50, y1: 150, x2: 100, y2: 300 }, // Moitié droite pour DC
-    { name: "MC", x1: 100, y1: 150, x2: 300, y2: 300 },
+    { name: "GB1", x1: 0, y1: 150, x2: 40, y2: 300 }, // GB1 réduit par 1/5 pour élargir GB2
+    { name: "GB2", x1: 40, y1: 150, x2: 120, y2: 300 }, // GB2 élargie vers GB1 et MC
+    { name: "MC", x1: 120, y1: 150, x2: 300, y2: 300 }, // MC réduit comme avant
     { name: "ATT", x1: 300, y1: 150, x2: 400, y2: 300 },
     { name: "DD", x1: 0, y1: 300, x2: 100, y2: 450 },
     { name: "MD", x1: 100, y1: 300, x2: 300, y2: 450 },
     { name: "AD", x1: 300, y1: 300, x2: 400, y2: 450 }
 ];
+
+
 
 
         // Trouver le poste correspondant à une position (x, y)
