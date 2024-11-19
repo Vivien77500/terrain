@@ -137,6 +137,23 @@
             text-align: center;
         }
 
+        .composition button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            background: #6fb98f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .composition button:hover {
+            background: #5aa67b;
+        }
+
         .selected {
             border: 2px solid #6fb98f;
         }
@@ -161,6 +178,7 @@
         <ul id="composition-list" class="composition-list">
             <!-- Joueurs placés sur le terrain -->
         </ul>
+        <button id="validate">Valider</button>
     </div>
 
     <script>
@@ -184,6 +202,7 @@
         const playersContainer = document.getElementById('players');
         const field = document.getElementById('field');
         const compositionList = document.getElementById('composition-list');
+        const validateButton = document.getElementById('validate');
         let selectedPlayer = null;
         let playerCount = 0;
 
@@ -236,7 +255,7 @@
                 compositionList.appendChild(listItem);
 
                 playerCount++;
-                if (playerCount === 8) {
+                if (playerCount === 9) {
                     const separator = document.createElement('li');
                     separator.classList.add('subsection');
                     separator.textContent = 'Remplaçants';
@@ -253,8 +272,8 @@
             closeBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
 
-                // Supprimer le joueur de la composition
-                const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
+                                // Supprimer le joueur de la composition
+                                const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
                 if (itemToRemove) {
                     itemToRemove.remove();
                 }
@@ -284,6 +303,81 @@
                 // Supprimer le joueur du terrain
                 playerDiv.remove();
             });
+        });
+
+        // Gestion du bouton Valider
+        validateButton.addEventListener('click', () => {
+            // Créer une fenêtre d'impression
+            const printWindow = window.open('', '_blank');
+            const printContent = `
+                <!DOCTYPE html>
+                <html lang="fr">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Impression Composition</title>
+                    <style>
+                        body {
+                            font-family: 'Assistant', sans-serif;
+                            margin: 0;
+                            padding: 20px;
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                        }
+                        .field {
+                            width: 60%;
+                            position: relative;
+                        }
+                        .field img {
+                            width: 100%;
+                        }
+                        .composition {
+                            width: 35%;
+                            padding: 10px;
+                            background: #fff;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                        }
+                        .composition h3 {
+                            text-align: center;
+                            margin-bottom: 10px;
+                            font-size: 18px;
+                            font-weight: bold;
+                        }
+                        .composition-list {
+                            list-style: none;
+                            padding: 0;
+                        }
+                        .composition-list li {
+                            margin-bottom: 5px;
+                            font-size: 14px;
+                        }
+                        .composition-list .subsection {
+                            margin-top: 10px;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="field">
+                        ${field.innerHTML}
+                    </div>
+                    <div class="composition">
+                        <h3>Composition</h3>
+                        <ul>
+                            ${compositionList.innerHTML}
+                        </ul>
+                    </div>
+                </body>
+                </html>
+            `;
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
         });
     </script>
 </body>
