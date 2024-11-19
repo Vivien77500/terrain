@@ -69,9 +69,9 @@
 
         .player span {
             margin-top: 5px;
-            font-size: 10px;
+            font-size: 12px; /* Agrandi de 2 unités */
+            font-weight: bold;
             text-align: center;
-            font-weight: normal;
         }
 
         .player-on-field {
@@ -92,11 +92,11 @@
 
         .player-on-field span {
             margin-top: 5px;
-            font-size: 2vw; /* Taille adaptable au viewport */
-            max-font-size: 10px; /* Taille maximale */
+            font-size: calc(1vw + 6px); /* Combine taille réactive et taille minimale */
             color: white;
             font-weight: bold;
             text-align: center;
+            line-height: 1.2;
         }
 
         .player-on-field .close-btn {
@@ -186,7 +186,7 @@
             }
 
             .player span {
-                font-size: 8px;
+                font-size: 10px; /* Ajustement pour petits écrans */
             }
 
             .player-on-field img {
@@ -195,8 +195,8 @@
             }
 
             .player-on-field span {
-                font-size: 1.5vw; /* Ajustement du texte */
-                max-font-size: 8px; /* Taille maximale */
+                font-size: calc(0.8vw + 4px); /* Ajustement pour petits écrans */
+                line-height: 1.1;
             }
         }
     </style>
