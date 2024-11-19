@@ -92,8 +92,8 @@
 
         .player-on-field span {
             margin-top: 5px;
-            font-size: 3vw; /* Taille du texte proportionnelle à la largeur de l'écran */
-            max-font-size: 12px; /* Taille maximale du texte */
+            font-size: 2vw; /* Taille adaptable au viewport */
+            max-font-size: 10px; /* Taille maximale */
             color: white;
             font-weight: bold;
             text-align: center;
@@ -187,6 +187,16 @@
 
             .player span {
                 font-size: 8px;
+            }
+
+            .player-on-field img {
+                width: 8vw; /* Réduit encore la taille pour petits écrans */
+                max-width: 40px;
+            }
+
+            .player-on-field span {
+                font-size: 1.5vw; /* Ajustement du texte */
+                max-font-size: 8px; /* Taille maximale */
             }
         }
     </style>
