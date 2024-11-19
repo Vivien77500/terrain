@@ -12,18 +12,17 @@
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             background-color: #f5f5f5;
         }
 
         .container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-direction: row;
             gap: 20px;
             width: 100%;
+            max-width: 1200px;
             padding: 10px;
             box-sizing: border-box;
         }
@@ -91,14 +90,13 @@
         }
 
         .player-on-field span {
-    margin-top: 5px;
-    font-size: 0.8vw; /* Taille réduite */
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    line-height: 1.2;
-}
-
+            margin-top: 5px;
+            font-size: 0.8vw;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.2;
+        }
 
         .player-on-field .close-btn {
             position: absolute;
@@ -116,8 +114,7 @@
         }
 
         .composition {
-            width: 100%;
-            max-width: 200px;
+            width: 250px;
             padding: 10px;
             background: #fff;
             border: 1px solid #ccc;
@@ -170,6 +167,11 @@
         }
 
         @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
             .field {
                 width: 100%;
                 height: auto;
@@ -195,7 +197,7 @@
             }
 
             .player-on-field span {
-                font-size: 6px; /* Plus petite taille sur mobile */
+                font-size: 6px;
                 line-height: 1.1;
             }
         }
@@ -203,25 +205,22 @@
 </head>
 <body>
     <div class="container">
-        <!-- Terrain -->
         <div class="field" id="field">
             <!-- Les joueurs placés apparaîtront ici -->
         </div>
-
-        <!-- Liste des joueurs -->
-        <div class="players" id="players">
-            <!-- Joueurs générés dynamiquement -->
+        <div class="composition">
+            <h3>Composition</h3>
+            <ul id="composition-list" class="composition-list">
+                <!-- Joueurs placés sur le terrain -->
+            </ul>
+            <button id="validate">Valider</button>
         </div>
     </div>
 
-    <!-- Liste de composition -->
-    <div class="composition">
-        <h3>Composition</h3>
-        <ul id="composition-list" class="composition-list">
-            <!-- Joueurs placés sur le terrain -->
-        </ul>
-        <button id="validate">Valider</button>
+    <div class="players" id="players">
+        <!-- Joueurs générés dynamiquement -->
     </div>
+
     <script>
         const players = [
             "Aaron Esnard le Foll", "Aaron Kae", "Aboubakar Ait Kassou", "Adam Redissi",
@@ -256,215 +255,214 @@
             { name: "MC", x1: 120, y1: 150, x2: 280, y2: 300 },
             { name: "ATT", x1: 280, y1: 150, x2: 400, y2: 300 },
             { name: "DD", x1: 0, y1: 300, x2: 120, y2: 450 },
-{ name: "MD", x1: 120, y1: 300, x2: 280, y2: 450 },
-{ name: "AD", x1: 280, y1: 300, x2: 400, y2: 450 }
-];
+            { name: "MD", x1: 120, y1: 300, x2: 280, y2: 450 },
+            { name: "AD", x1: 280, y1: 300, x2: 400, y2: 450 }
+        ];
 
-function getPositionRole(x, y) {
-for (const zone of zones) {
-    if (x >= zone.x1 && x < zone.x2 && y >= zone.y1 && y < zone.y2) {
-        return zone.name;
-    }
-}
-return "N/A";
-}
-
-players.forEach(player => {
-const playerDiv = document.createElement('div');
-playerDiv.classList.add('player');
-playerDiv.innerHTML = `
-    <img src="joueur.png" alt="Joueur">
-    <span>${player.split(' ')[0]} ${player.split(' ')[1]?.[0] || ''}.</span>
-`;
-playersContainer.appendChild(playerDiv);
-
-playerDiv.addEventListener('click', () => {
-    if (selectedPlayer) {
-        selectedPlayer.classList.remove('selected');
-    }
-    selectedPlayer = playerDiv;
-    playerDiv.classList.add('selected');
-});
-});
-
-field.addEventListener('click', (e) => {
-if (!selectedPlayer) {
-    alert("Veuillez d'abord sélectionner un joueur.");
-    return;
-}
-
-const playerName = selectedPlayer.textContent.trim();
-const x = e.offsetX;
-const y = e.offsetY;
-
-const positionRole = getPositionRole(x, y);
-
-const playerDiv = document.createElement('div');
-playerDiv.classList.add('player-on-field');
-const isGoalkeeper = positionRole === "GB";
-const imgSrc = isGoalkeeper ? "joueurGB.png" : "joueur.png";
-playerDiv.innerHTML = `
-    <img src="${imgSrc}" alt="Joueur">
-    <span>${playerName}</span>
-    <button class="close-btn">&times;</button>
-`;
-playerDiv.style.left = `${x}px`;
-playerDiv.style.top = `${y}px`;
-
-field.appendChild(playerDiv);
-
-if (!document.querySelector(`li[data-player="${playerName}"]`)) {
-    const listItem = document.createElement('li');
-    listItem.textContent = `${playerName} (${positionRole})`;
-    listItem.setAttribute('data-player', playerName);
-    compositionList.appendChild(listItem);
-
-    playerCount++;
-    if (playerCount === 8) {
-        const separator = document.createElement('li');
-        separator.classList.add('subsection');
-        separator.textContent = 'Remplaçants';
-        compositionList.appendChild(separator);
-    }
-}
-
-selectedPlayer.remove();
-selectedPlayer = null;
-
-const closeBtn = playerDiv.querySelector('.close-btn');
-closeBtn.addEventListener('click', (event) => {
-    event.stopPropagation();
-
-    const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
-    if (itemToRemove) {
-        itemToRemove.remove();
-    }
-
-    playerCount--;
-    if (playerCount === 7) {
-        const separator = document.querySelector('.composition-list .subsection');
-        if (separator) separator.remove();
-    }
-
-    const newPlayerDiv = document.createElement('div');
-    newPlayerDiv.classList.add('player');
-    newPlayerDiv.innerHTML = `
-        <img src="joueur.png" alt="Joueur">
-        <span>${playerName}</span>
-    `;
-    playersContainer.appendChild(newPlayerDiv);
-
-    newPlayerDiv.addEventListener('click', () => {
-        if (selectedPlayer) {
-            selectedPlayer.classList.remove('selected');
+        function getPositionRole(x, y) {
+            for (const zone of zones) {
+                if (x >= zone.x1 && x < zone.x2 && y >= zone.y1 && y < zone.y2) {
+                    return zone.name;
+                }
+            }
+            return "N/A";
         }
-        selectedPlayer = newPlayerDiv;
-        newPlayerDiv.classList.add('selected');
-    });
 
-    playerDiv.remove();
-});
-});
+        players.forEach(player => {
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player');
+            playerDiv.innerHTML = `
+                <img src="joueur.png" alt="Joueur">
+                <span>${player.split(' ')[0]} ${player.split(' ')[1]?.[0] || ''}.</span>
+            `;
+            playersContainer.appendChild(playerDiv);
 
-validateButton.addEventListener('click', () => {
-const printWindow = window.open('', '_blank');
-const printContent = `
-    <!DOCTYPE html>
-    <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Impression Composition</title>
-        <style>
-            body {
-                font-family: 'Assistant', sans-serif;
-                margin: 0;
-                padding: 20px;
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: flex-start;
+            playerDiv.addEventListener('click', () => {
+                if (selectedPlayer) {
+                    selectedPlayer.classList.remove('selected');
+                }
+                selectedPlayer = playerDiv;
+                playerDiv.classList.add('selected');
+            });
+        });
+
+        field.addEventListener('click', (e) => {
+            if (!selectedPlayer) {
+                alert("Veuillez d'abord sélectionner un joueur.");
+                return;
             }
-            .field {
-                width: 60%;
-                position: relative;
+
+            const playerName = selectedPlayer.textContent.trim();
+            const x = e.offsetX;
+            const y = e.offsetY;
+
+            const positionRole = getPositionRole(x, y);
+
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player-on-field');
+            const imgSrc = positionRole === "GB" ? "joueurGB.png" : "joueur.png";
+            playerDiv.innerHTML = `
+                <img src="${imgSrc}" alt="Joueur">
+                <span>${playerName}</span>
+                <button class="close-btn">&times;</button>
+            `;
+            playerDiv.style.left = `${x}px`;
+            playerDiv.style.top = `${y}px`;
+
+            field.appendChild(playerDiv);
+
+            if (!document.querySelector(`li[data-player="${playerName}"]`)) {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${playerName} (${positionRole})`;
+                listItem.setAttribute('data-player', playerName);
+                compositionList.appendChild(listItem);
+
+                playerCount++;
+                if (playerCount === 8) {
+                    const separator = document.createElement('li');
+                    separator.classList.add('subsection');
+                    separator.textContent = 'Remplaçants';
+                    compositionList.appendChild(separator);
+                }
             }
-            .field img {
-                width: 100%;
-                height: auto;
-            }
-            .player-on-field {
-                position: absolute;
-                transform: translate(-50%, -50%);
-                font-weight: bold;
-                text-align: center;
-            }
-            .player-on-field img {
-                width: 8%;
-                height: auto;
-            }
-            .player-on-field span {
-                margin-top: 5px;
-                font-size: 1vw;
-                color: white;
-                font-weight: bold;
-                text-align: center;
-            }
-            .composition {
-                width: 35%;
-                padding: 10px;
-                background: #fff;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-            }
-            .composition h3 {
-                text-align: center;
-                margin-bottom: 10px;
-                font-size: 18px;
-                font-weight: bold;
-            }
-            .composition-list {
-                list-style: none;
-                padding: 0;
-                font-weight: bold;
-            }
-            .composition-list li {
-                margin-bottom: 5px;
-                font-size: 14px;
-            }
-            .composition-list .subsection {
-                margin-top: 10px;
-                font-weight: bold;
-                text-align: center;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="field">
-            <img src="terrain.png" alt="Terrain">
-            ${Array.from(field.querySelectorAll('.player-on-field'))
-                .map(player => {
-                    const playerCopy = player.cloneNode(true);
-                    const closeBtn = playerCopy.querySelector('.close-btn');
-                    if (closeBtn) closeBtn.remove();
-                    return playerCopy.outerHTML;
-                })
-                .join('')}
-        </div>
-        <div class="composition">
-            <h3>Composition</h3>
-            <ul>
-                ${compositionList.innerHTML}
-            </ul>
-        </div>
-    </body>
-    </html>
-`;
-printWindow.document.write(printContent);
-printWindow.document.close();
-printWindow.focus();
-printWindow.print();
-});
-</script>
+
+            selectedPlayer.remove();
+            selectedPlayer = null;
+
+            const closeBtn = playerDiv.querySelector('.close-btn');
+            closeBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+
+                const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
+                if (itemToRemove) {
+                    itemToRemove.remove();
+                }
+
+                playerCount--;
+                if (playerCount === 7) {
+                    const separator = document.querySelector('.composition-list .subsection');
+                    if (separator) separator.remove();
+                }
+
+                const newPlayerDiv = document.createElement('div');
+                newPlayerDiv.classList.add('player');
+                newPlayerDiv.innerHTML = `
+                    <img src="joueur.png" alt="Joueur">
+                    <span>${playerName}</span>
+                `;
+                playersContainer.appendChild(newPlayerDiv);
+
+                newPlayerDiv.addEventListener('click', () => {
+                    if (selectedPlayer) {
+                        selectedPlayer.classList.remove('selected');
+                    }
+                    selectedPlayer = newPlayerDiv;
+                    newPlayerDiv.classList.add('selected');
+                });
+
+                playerDiv.remove();
+            });
+        });
+
+        validateButton.addEventListener('click', () => {
+            const printWindow = window.open('', '_blank');
+            const printContent = `
+                <!DOCTYPE html>
+                <html lang="fr">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Impression Composition</title>
+                    <style>
+                        body {
+                            font-family: 'Assistant', sans-serif;
+                            margin: 0;
+                            padding: 20px;
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                        }
+                        .field {
+                            width: 60%;
+                            position: relative;
+                        }
+                        .field img {
+                            width: 100%;
+                            height: auto;
+                        }
+                        .player-on-field {
+                            position: absolute;
+                            transform: translate(-50%, -50%);
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                        .player-on-field img {
+                            width: 8%;
+                            height: auto;
+                        }
+                        .player-on-field span {
+                            margin-top: 5px;
+                            font-size: 1vw;
+                            color: white;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                        .composition {
+                            width: 35%;
+                            padding: 10px;
+                            background: #fff;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                        }
+                        .composition h3 {
+                            text-align: center;
+                            margin-bottom: 10px;
+                            font-size: 18px;
+                            font-weight: bold;
+                        }
+                        .composition-list {
+                            list-style: none;
+                            padding: 0;
+                            font-weight: bold;
+                        }
+                        .composition-list li {
+                            margin-bottom: 5px;
+                            font-size: 14px;
+                        }
+                        .composition-list .subsection {
+                            margin-top: 10px;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="field">
+                        <img src="terrain.png" alt="Terrain">
+                        ${Array.from(field.querySelectorAll('.player-on-field'))
+                            .map(player => {
+                                const playerCopy = player.cloneNode(true);
+                                const closeBtn = playerCopy.querySelector('.close-btn');
+                                if (closeBtn) closeBtn.remove();
+                                return playerCopy.outerHTML;
+                            })
+                            .join('')}
+                    </div>
+                    <div class="composition">
+                        <h3>Composition</h3>
+                        <ul>
+                            ${compositionList.innerHTML}
+                        </ul>
+                    </div>
+                </body>
+                </html>
+            `;
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+        });
+    </script>
 </body>
 </html>
