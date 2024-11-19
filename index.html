@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terrain de Football</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .field {
+            width: 700px;
+            height: 500px;
+            background: url('terrain.png') no-repeat center center;
+            background-size: contain;
+            position: relative;
+            border: 2px solid #ccc;
+        }
+
+        .players {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 700px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ccc;
+        }
+
+        .player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 5px;
+            background: #fdfdfd;
+        }
+
+        .player img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .player span {
+            margin-top: 5px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .player-on-field {
+            position: absolute;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .player-on-field img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .player-on-field span {
+            margin-top: 5px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .player-on-field .close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .selected {
+            border: 2px solid #6fb98f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Terrain -->
+        <div class="field" id="field">
+            <!-- Les joueurs placés apparaîtront ici -->
+        </div>
+
+        <!-- Liste des joueurs -->
+        <div class="players" id="players">
+            <!-- Joueurs générés dynamiquement -->
+        </div>
+    </div>
+
+    <script>
+        const players = [
+            "Aaron Esnard le Foll", "Aaron Kae", "Aboubakar Ait Kassou", "Adam Redissi",
+            "Adil Lalaoui", "Amine Benboubker", "Assane Fadika", "Aurélien Achard",
+            "Axel Aggar", "Bradley Woloko Lipeta", "Charle Mendes", "Elijah Banzulu",
+            "Emmanuel Makkaya", "Erwann Pierre", "Ethan Henriet", "Ethan Tomas Espejo",
+            "Farhan Soumanou", "Hosiya", "Ilyes Aissi", "Imed Hassan", "Imran Ben Yahia",
+            "Isaac Sogo", "Junayd Bourezgui", "Kayis Amari", "Kiany Babelana Matondo",
+            "Kyliane Kibuku", "Loucas Assabbane", "Lemiere Laiky", "Lenny Exumat",
+            "Lenyh Delegove-Vally", "Liam Faria", "Manyl Boubrit", "Mathis Sidhoumi",
+            "Mohamed Rakhaoui", "Naïl Mehdi", "Noham Ksia", "Rafael Esteves",
+            "Raphaël You Khou", "Ryad Mayass", "Ryan Badawy", "Ryan Chaabi",
+            "Said Hassan Akbas", "Habishan", "Kishan", "Soulayman Mhamdi",
+            "Thaïs Ntone", "Théo Daigueperce", "Tiago Gendarme", "Tohiniaina Andritsizehena",
+            "Valentin Cherel", "William Dambrun", "Yacine Touati", "Yani Bouchelkia", "Aylan Bouchelkia", "Yanis Mehdi"
+        ];
+
+        const playersContainer = document.getElementById('players');
+        const field = document.getElementById('field');
+        let selectedPlayer = null;
+
+        // Générer les joueurs
+        players.forEach(player => {
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player');
+            
+            const playerParts = player.split(' ');
+            let displayName = playerParts[0];
+            if (playerParts.length === 2) {
+                displayName = `${playerParts[0]} ${playerParts[1][0]}.`;
+            }
+
+            playerDiv.innerHTML = `
+                <img src="joueur.png" alt="Joueur">
+                <span>${displayName}</span>
+            `;
+            playersContainer.appendChild(playerDiv);
+
+            // Sélectionner un joueur dans la liste
+            playerDiv.addEventListener('click', () => {
+                if (selectedPlayer) {
+                    selectedPlayer.classList.remove('selected');
+                }
+                selectedPlayer = playerDiv;
+                playerDiv.classList.add('selected');
+            });
+        });
+
+        // Gérer les clics sur le terrain
+        field.addEventListener('click', (e) => {
+            if (!selectedPlayer) {
+                alert("Veuillez d'abord sélectionner un joueur.");
+                return;
+            }
+
+            // Si le joueur sélectionné est déjà sur le terrain, simplement le repositionner
+            if (selectedPlayer.classList.contains('player-on-field')) {
+                selectedPlayer.style.left = `${e.offsetX}px`;
+                selectedPlayer.style.top = `${e.offsetY}px`;
+                selectedPlayer.classList.remove('selected');
+                selectedPlayer = null;
+                return;
+            }
+
+            // Ajouter un nouveau joueur au terrain
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player-on-field');
+            playerDiv.innerHTML = `
+                ${selectedPlayer.innerHTML}
+                <button class="close-btn">&times;</button>
+            `;
+
+            playerDiv.style.left = `${e.offsetX}px`;
+            playerDiv.style.top = `${e.offsetY}px`;
+
+            field.appendChild(playerDiv);
+
+            // Supprimer le joueur de la liste
+            selectedPlayer.remove();
+            selectedPlayer = null;
+
+            // Gérer la sélection et le repositionnement des joueurs sur le terrain
+            playerDiv.addEventListener('click', (event) => {
+                event.stopPropagation(); // Empêche le clic sur le terrain
+                if (selectedPlayer) {
+                    selectedPlayer.classList.remove('selected');
+                }
+                selectedPlayer = playerDiv;
+                playerDiv.classList.add('selected');
+            });
+
+            // Gérer le retour dans la liste avec la croix rouge
+            const closeBtn = playerDiv.querySelector('.close-btn');
+            closeBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const newPlayerDiv = document.createElement('div');
+                newPlayerDiv.classList.add('player');
+                newPlayerDiv.innerHTML = playerDiv.innerHTML.split('<button')[0]; // Supprime la croix rouge
+                playersContainer.appendChild(newPlayerDiv);
+
+                // Gérer la sélection à nouveau
+                newPlayerDiv.addEventListener('click', () => {
+                    if (selectedPlayer) {
+                        selectedPlayer.classList.remove('selected');
+                    }
+                    selectedPlayer = newPlayerDiv;
+                    newPlayerDiv.classList.add('selected');
+                });
+
+                playerDiv.remove(); // Supprime le joueur du terrain
+            });
+        });
+    </script>
+</body>
+</html>
