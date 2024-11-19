@@ -268,20 +268,20 @@
             selectedPlayer.remove();
             selectedPlayer = null;
 
-                        // Gérer le retour dans la liste avec la croix rouge
-                        const closeBtn = playerDiv.querySelector('.close-btn');
+            // Gérer le retour dans la liste avec la croix rouge
+            const closeBtn = playerDiv.querySelector('.close-btn');
             closeBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
 
-                // Supprimer le joueur de la composition
-                const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
+                                // Supprimer le joueur de la composition
+                                const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
                 if (itemToRemove) {
                     itemToRemove.remove();
                 }
 
                 // Réduire le compteur de joueurs et supprimer le séparateur si nécessaire
                 playerCount--;
-                if (playerCount === 8) {
+                if (playerCount === 7) { // Revenir à 7 joueurs pour supprimer le séparateur
                     const separator = document.querySelector('.composition-list .subsection');
                     if (separator) separator.remove();
                 }
