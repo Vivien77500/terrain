@@ -209,16 +209,18 @@
 
         // Définir les zones du terrain et leurs postes associés
         const zones = [
-            { name: "GB", x1: 0, y1: 0, x2: 100, y2: 150 },
-            { name: "DC", x1: 100, y1: 0, x2: 300, y2: 150 },
-            { name: "DD", x1: 300, y1: 0, x2: 400, y2: 150 },
-            { name: "DG", x1: 0, y1: 150, x2: 100, y2: 300 },
-            { name: "MC", x1: 100, y1: 150, x2: 300, y2: 300 },
-            { name: "MD", x1: 300, y1: 150, x2: 400, y2: 300 },
-            { name: "MG", x1: 0, y1: 300, x2: 100, y2: 450 },
-            { name: "ATT", x1: 100, y1: 300, x2: 300, y2: 450 },
-            { name: "REMP", x1: 300, y1: 300, x2: 400, y2: 450 }
-        ];
+    { name: "DG", x1: 0, y1: 0, x2: 100, y2: 150 },
+    { name: "MG", x1: 100, y1: 0, x2: 300, y2: 150 },
+    { name: "AG", x1: 300, y1: 0, x2: 400, y2: 150 },
+    { name: "GB", x1: 0, y1: 150, x2: 50, y2: 300 }, // Moitié gauche pour GB
+    { name: "DC", x1: 50, y1: 150, x2: 100, y2: 300 }, // Moitié droite pour DC
+    { name: "MC", x1: 100, y1: 150, x2: 300, y2: 300 },
+    { name: "ATT", x1: 300, y1: 150, x2: 400, y2: 300 },
+    { name: "DD", x1: 0, y1: 300, x2: 100, y2: 450 },
+    { name: "MD", x1: 100, y1: 300, x2: 300, y2: 450 },
+    { name: "AD", x1: 300, y1: 300, x2: 400, y2: 450 }
+];
+
 
         // Trouver le poste correspondant à une position (x, y)
         function getPositionRole(x, y) {
