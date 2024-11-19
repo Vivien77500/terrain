@@ -273,8 +273,8 @@
             closeBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
 
-                 // Supprimer le joueur de la composition
-                 const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
+                // Supprimer le joueur de la composition
+                const itemToRemove = document.querySelector(`li[data-player="${playerName}"]`);
                 if (itemToRemove) {
                     itemToRemove.remove();
                 }
@@ -329,6 +329,7 @@
                         }
                         .field {
                             width: 60%;
+                            height: auto;
                             position: relative;
                         }
                         .field img {
@@ -383,7 +384,13 @@
                     <div class="field">
                         <img src="terrain.png" alt="Terrain">
                         ${Array.from(field.querySelectorAll('.player-on-field'))
-                            .map(player => player.outerHTML)
+                            .map(player => {
+                                // Supprimer la croix rouge pour chaque joueur
+                                const playerCopy = player.cloneNode(true);
+                                const closeBtn = playerCopy.querySelector('.close-btn');
+                                if (closeBtn) closeBtn.remove();
+                                return playerCopy.outerHTML;
+                            })
                             .join('')}
                     </div>
                     <div class="composition">
@@ -403,4 +410,4 @@
     </script>
 </body>
 </html>
-               
+
